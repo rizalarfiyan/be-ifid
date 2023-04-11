@@ -3,7 +3,13 @@ package main
 import (
 	"be-ifid/config"
 	"be-ifid/database"
+	"be-ifid/model"
 	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func init() {
@@ -12,5 +18,23 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Hello World")
+	conf := config.Get()
+
+	app := fiber.New(config.FiberConfig())
+	app.Use(recover.New())
+
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		ctx.JSON(model.BaseResponse{
+			Code:    http.StatusOK,
+			Message: "Success!",
+			Data:    nil,
+		})
+		return nil
+	})
+
+	baseUrl := fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort)
+	err := app.Listen(baseUrl)
+	if err != nil {
+		log.Fatalf("Error app serve: %v \n", err.Error())
+	}
 }
