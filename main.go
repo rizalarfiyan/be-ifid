@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -22,6 +24,8 @@ func main() {
 
 	app := fiber.New(config.FiberConfig())
 	app.Use(recover.New())
+	app.Use(cors.New(config.CorsConfig()))
+	app.Use(logger.New())
 
 	app.Get("/", func(ctx *fiber.Ctx) error {
 		ctx.JSON(model.BaseResponse{

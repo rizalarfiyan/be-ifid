@@ -1,9 +1,8 @@
 package config
 
 import (
+	"be-ifid/helpers"
 	"log"
-	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -11,11 +10,12 @@ import (
 type Config struct {
 	ServerPort         int
 	ServerHost         string
-	FirebaseConfig     FirebaseConfig
+	FirebaseConfig     FirebaseConfigs
 	FirebaseCredential FirebaseCredentials
+	Cors               CorsConfigs
 }
 
-type FirebaseConfig struct {
+type FirebaseConfigs struct {
 	DatabaseUrl string
 }
 
@@ -32,6 +32,14 @@ type FirebaseCredentials struct {
 	ClientX509CertUrl       string `json:"client_x509_cert_url"`
 }
 
+type CorsConfigs struct {
+	AllowOrigins     string
+	AllowMethods     string
+	AllowHeaders     string
+	AllowCredentials bool
+	ExposeHeaders    string
+}
+
 var (
 	conf *Config
 )
@@ -43,20 +51,26 @@ func Init() {
 	}
 
 	conf = new(Config)
-	conf.ServerPort, _ = strconv.Atoi(os.Getenv(`PORT`))
-	conf.ServerHost = os.Getenv(`HOST`)
+	conf.ServerPort = helpers.GetEnvAsInt("PORT", 8080)
+	conf.ServerHost = helpers.GetEnv("HOST", "")
 
-	conf.FirebaseConfig.DatabaseUrl = os.Getenv(`FIREBASE_DATABASE`)
-	conf.FirebaseCredential.Type = os.Getenv(`FIREBASE_TYPE`)
-	conf.FirebaseCredential.ProjectId = os.Getenv(`FIREBASE_PROJECT_ID`)
-	conf.FirebaseCredential.PrivateKeyId = os.Getenv(`FIREBASE_PRIVATE_KEY_ID`)
-	conf.FirebaseCredential.PrivateKey = os.Getenv(`FIREBASE_PRIVATE_KEY`)
-	conf.FirebaseCredential.ClientEmail = os.Getenv(`FIREBASE_CLIENT_EMAIL`)
-	conf.FirebaseCredential.ClientId = os.Getenv(`FIREBASE_CLIENT_ID`)
-	conf.FirebaseCredential.AuthUri = os.Getenv(`FIREBASE_AUTH_URI`)
-	conf.FirebaseCredential.TokenUri = os.Getenv(`FIREBASE_TOKEN_URI`)
-	conf.FirebaseCredential.AuthProviderX509CertUrl = os.Getenv(`FIREBASE_AUTH_PROVIDER_X509_CERT_URL`)
-	conf.FirebaseCredential.ClientX509CertUrl = os.Getenv(`FIREBASE_CLIENT_X509_CERT_URL`)
+	conf.FirebaseConfig.DatabaseUrl = helpers.GetEnv("FIREBASE_DATABASE", "")
+	conf.FirebaseCredential.Type = helpers.GetEnv("FIREBASE_TYPE", "")
+	conf.FirebaseCredential.ProjectId = helpers.GetEnv("FIREBASE_PROJECT_ID", "")
+	conf.FirebaseCredential.PrivateKeyId = helpers.GetEnv("FIREBASE_PRIVATE_KEY_ID", "")
+	conf.FirebaseCredential.PrivateKey = helpers.GetEnv("FIREBASE_PRIVATE_KEY", "")
+	conf.FirebaseCredential.ClientEmail = helpers.GetEnv("FIREBASE_CLIENT_EMAIL", "")
+	conf.FirebaseCredential.ClientId = helpers.GetEnv("FIREBASE_CLIENT_ID", "")
+	conf.FirebaseCredential.AuthUri = helpers.GetEnv("FIREBASE_AUTH_URI", "")
+	conf.FirebaseCredential.TokenUri = helpers.GetEnv("FIREBASE_TOKEN_URI", "")
+	conf.FirebaseCredential.AuthProviderX509CertUrl = helpers.GetEnv("FIREBASE_AUTH_PROVIDER_X509_CERT_URL", "")
+	conf.FirebaseCredential.ClientX509CertUrl = helpers.GetEnv("FIREBASE_CLIENT_X509_CERT_URL", "")
+
+	conf.Cors.AllowOrigins = helpers.GetEnv("ALLOW_ORIGINS", "")
+	conf.Cors.AllowMethods = helpers.GetEnv("ALLOW_METHODS", "")
+	conf.Cors.AllowHeaders = helpers.GetEnv("ALLOW_HEADERS", "")
+	conf.Cors.AllowCredentials = helpers.GetEnvAsBool("ALLOW_CREDENTIALS", false)
+	conf.Cors.ExposeHeaders = helpers.GetEnv("EXPOSE_HEADERS", "")
 }
 
 func Get() *Config {
