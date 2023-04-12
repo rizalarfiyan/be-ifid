@@ -3,10 +3,10 @@ package main
 import (
 	"be-ifid/config"
 	"be-ifid/database"
-	"be-ifid/model"
+	"be-ifid/internal"
+	"be-ifid/internal/handler"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -27,14 +27,10 @@ func main() {
 	app.Use(cors.New(config.CorsConfig()))
 	app.Use(logger.New())
 
-	app.Get("/", func(ctx *fiber.Ctx) error {
-		ctx.JSON(model.BaseResponse{
-			Code:    http.StatusOK,
-			Message: "Success!",
-			Data:    nil,
-		})
-		return nil
-	})
+	baseHandler := handler.NewBaseHandler()
+
+	route := internal.NewRouter(app)
+	route.BaseRoute(baseHandler)
 
 	baseUrl := fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort)
 	err := app.Listen(baseUrl)

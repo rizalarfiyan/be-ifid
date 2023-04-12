@@ -1,7 +1,7 @@
 package exception
 
 import (
-	"be-ifid/model"
+	"be-ifid/internal/model"
 	"errors"
 	"net/http"
 
