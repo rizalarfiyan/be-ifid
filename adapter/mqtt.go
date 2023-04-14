@@ -42,3 +42,14 @@ func MQTTInit() {
 func MQTTGet() *mqtt.Client {
 	return mqttConn
 }
+
+func MQTTIsConnected() bool {
+	if mqttConn == nil {
+		return false
+	}
+	connected := (*mqttConn).IsConnected()
+	if !connected {
+		utils.SafeError("MQTT fails health check")
+	}
+	return connected
+}

@@ -36,3 +36,12 @@ func PostgresInit() {
 func PostgresGet() *sqlx.DB {
 	return postgresConn
 }
+
+func PostgresIsConnected() bool {
+	err := postgresConn.Ping()
+	if err != nil {
+		utils.SafeError("Postgres fails health check")
+		return false
+	}
+	return true
+}
