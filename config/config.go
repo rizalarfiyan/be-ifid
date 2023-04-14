@@ -8,11 +8,12 @@ import (
 )
 
 type Config struct {
-	Port int
-	Host string
-	Cors CorsConfigs
-	MQTT MQTTConfigs
-	DB   DBConfigs
+	Port  int
+	Host  string
+	Cors  CorsConfigs
+	MQTT  MQTTConfigs
+	DB    DBConfigs
+	Redis RedisConfigs
 }
 
 type CorsConfigs struct {
@@ -45,6 +46,15 @@ type DBConfigs struct {
 	ConnectionLifetime time.Duration
 	MaxIdle            int
 	MaxOpen            int
+}
+
+type RedisConfigs struct {
+	Host            string
+	Port            int
+	User            string
+	Password        string
+	ExpiredDuration time.Duration
+	DialTimeout     time.Duration
 }
 
 var conf *Config
@@ -82,6 +92,13 @@ func Init() {
 	conf.DB.ConnectionLifetime = utils.GetEnvAsTimeDuration("DB_CONNECTION_LIFETIME", 5*time.Minute)
 	conf.DB.MaxIdle = utils.GetEnvAsInt("DB_MAX_IDLE", 20)
 	conf.DB.MaxOpen = utils.GetEnvAsInt("DB_MAX_OPEN", 50)
+
+	conf.Redis.Host = utils.GetEnv("REDIS_HOST", "")
+	conf.Redis.Port = utils.GetEnvAsInt("REDIS_PORT", 6379)
+	conf.Redis.User = utils.GetEnv("REDIS_USER", "")
+	conf.Redis.Password = utils.GetEnv("REDIS_PASSWORD", "")
+	conf.Redis.ExpiredDuration = utils.GetEnvAsTimeDuration("REDIS_EXPIRED_DURATION", 15*time.Minute)
+	conf.Redis.DialTimeout = utils.GetEnvAsTimeDuration("REDIS_DIAL_TIMEOUT", 5*time.Minute)
 
 	utils.Success("Config is loaded successfully")
 }

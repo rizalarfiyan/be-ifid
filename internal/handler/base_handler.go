@@ -30,6 +30,7 @@ func (h *baseHandler) Home(ctx *fiber.Ctx) error {
 			"status": map[string]interface{}{
 				"postgres": database.PostgresIsConnected(),
 				"mqtt":     adapter.MQTTIsConnected(),
+				"redis":    database.RedisIsConnected(),
 			},
 		},
 	})

@@ -20,6 +20,7 @@ func init() {
 	config.Init()
 	database.PostgresInit()
 	adapter.MQTTInit()
+	database.RedisInit()
 }
 
 func main() {
