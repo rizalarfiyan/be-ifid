@@ -1,10 +1,12 @@
 package main
 
 import (
+	"be-ifid/adapter"
 	"be-ifid/config"
 	"be-ifid/database"
 	"be-ifid/internal"
 	"be-ifid/internal/handler"
+	"be-ifid/internal/service"
 	"fmt"
 	"log"
 
@@ -17,6 +19,7 @@ import (
 func init() {
 	config.Init()
 	database.Init()
+	adapter.MQTTInit()
 }
 
 func main() {
@@ -27,8 +30,10 @@ func main() {
 	app.Use(cors.New(config.CorsConfig()))
 	app.Use(logger.New())
 
-	baseHandler := handler.NewBaseHandler()
+	mqtt := adapter.MQTTGet()
+	service.NewMQTTService(*mqtt, conf).Subscibe()
 
+	baseHandler := handler.NewBaseHandler()
 	route := internal.NewRouter(app)
 	route.BaseRoute(baseHandler)
 

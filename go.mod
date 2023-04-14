@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	firebase.google.com/go/v4 v4.11.0
+	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/gofiber/fiber/v2 v2.43.0
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.116.0
@@ -26,6 +27,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect

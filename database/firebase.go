@@ -11,9 +11,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-var (
-	client *db.Client
-)
+var client *db.Client
 
 func Init() {
 	ctx := context.Background()

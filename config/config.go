@@ -13,6 +13,7 @@ type Config struct {
 	FirebaseConfig     FirebaseConfigs
 	FirebaseCredential FirebaseCredentials
 	Cors               CorsConfigs
+	MQTT               MQTTConfigs
 }
 
 type FirebaseConfigs struct {
@@ -40,9 +41,19 @@ type CorsConfigs struct {
 	ExposeHeaders    string
 }
 
-var (
-	conf *Config
-)
+type MQTTConfigs struct {
+	ClientId string
+	Server   string
+	Port     int
+	User     string
+	Password string
+	Topic    struct {
+		Watch string
+		Send  string
+	}
+}
+
+var conf *Config
 
 func Init() {
 	err := godotenv.Load(".env")
@@ -71,6 +82,14 @@ func Init() {
 	conf.Cors.AllowHeaders = helpers.GetEnv("ALLOW_HEADERS", "")
 	conf.Cors.AllowCredentials = helpers.GetEnvAsBool("ALLOW_CREDENTIALS", false)
 	conf.Cors.ExposeHeaders = helpers.GetEnv("EXPOSE_HEADERS", "")
+
+	conf.MQTT.ClientId = helpers.GetEnv("MQTT_CLIENT_ID", "be-ifid")
+	conf.MQTT.Server = helpers.GetEnv("MQTT_SERVER", "")
+	conf.MQTT.Port = helpers.GetEnvAsInt("MQTT_PORT", 1883)
+	conf.MQTT.User = helpers.GetEnv("MQTT_USER", "")
+	conf.MQTT.Password = helpers.GetEnv("MQTT_PASSWORD", "")
+	conf.MQTT.Topic.Watch = helpers.GetEnv("MQTT_TOPIC_WATCH", "")
+	conf.MQTT.Topic.Send = helpers.GetEnv("MQTT_TOPIC_SEND", "")
 }
 
 func Get() *Config {
