@@ -5,7 +5,6 @@ import (
 	"be-ifid/utils"
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -22,10 +21,11 @@ func PostgresInit() {
 	if err != nil {
 		utils.Error("Postgres connection problem: ", err)
 	}
-	db.SetMaxIdleConns(10)
-	db.SetConnMaxLifetime(100)
-	db.SetConnMaxIdleTime(2 * time.Second)
-	db.SetConnMaxLifetime(60 * time.Second)
+
+	db.SetConnMaxIdleTime(conf.DB.ConnectionIdle)
+	db.SetConnMaxLifetime(conf.DB.ConnectionLifetime)
+	db.SetMaxIdleConns(conf.DB.MaxIdle)
+	db.SetMaxOpenConns(conf.DB.MaxOpen)
 
 	postgresConn = new(sqlx.DB)
 	postgresConn = db

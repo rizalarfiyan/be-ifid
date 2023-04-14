@@ -2,6 +2,7 @@ package config
 
 import (
 	"be-ifid/utils"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -35,11 +36,15 @@ type MQTTConfigs struct {
 }
 
 type DBConfigs struct {
-	Name     string
-	Host     string
-	Port     int
-	User     string
-	Password string
+	Name               string
+	Host               string
+	Port               int
+	User               string
+	Password           string
+	ConnectionIdle     time.Duration
+	ConnectionLifetime time.Duration
+	MaxIdle            int
+	MaxOpen            int
 }
 
 var conf *Config
@@ -73,6 +78,10 @@ func Init() {
 	conf.DB.Port = utils.GetEnvAsInt("DB_PORT", 5432)
 	conf.DB.User = utils.GetEnv("DB_USER", "")
 	conf.DB.Password = utils.GetEnv("DB_PASSWORD", "")
+	conf.DB.ConnectionIdle = utils.GetEnvAsTimeDuration("DB_CONNECTION_IDLE", 1*time.Minute)
+	conf.DB.ConnectionLifetime = utils.GetEnvAsTimeDuration("DB_CONNECTION_LIFETIME", 5*time.Minute)
+	conf.DB.MaxIdle = utils.GetEnvAsInt("DB_MAX_IDLE", 20)
+	conf.DB.MaxOpen = utils.GetEnvAsInt("DB_MAX_OPEN", 50)
 
 	utils.Success("Config is loaded successfully")
 }
