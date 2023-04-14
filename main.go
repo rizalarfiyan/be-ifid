@@ -3,7 +3,6 @@ package main
 import (
 	"be-ifid/adapter"
 	"be-ifid/config"
-	"be-ifid/database"
 	"be-ifid/internal"
 	"be-ifid/internal/handler"
 	"be-ifid/internal/service"
@@ -18,7 +17,6 @@ import (
 
 func init() {
 	config.Init()
-	database.Init()
 	adapter.MQTTInit()
 }
 
@@ -37,7 +35,7 @@ func main() {
 	route := internal.NewRouter(app)
 	route.BaseRoute(baseHandler)
 
-	baseUrl := fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort)
+	baseUrl := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	err := app.Listen(baseUrl)
 	if err != nil {
 		log.Fatalf("Error app serve: %v \n", err.Error())
