@@ -1,8 +1,7 @@
 package config
 
 import (
-	"be-ifid/helpers"
-	"log"
+	"be-ifid/utils"
 
 	"github.com/joho/godotenv"
 )
@@ -48,32 +47,34 @@ var conf *Config
 func Init() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalln(".env is not loaded properly")
+		utils.Error(".env is not loaded properly")
 	}
 
 	conf = new(Config)
-	conf.Port = helpers.GetEnvAsInt("PORT", 8080)
-	conf.Host = helpers.GetEnv("HOST", "")
+	conf.Port = utils.GetEnvAsInt("PORT", 8080)
+	conf.Host = utils.GetEnv("HOST", "")
 
-	conf.Cors.AllowOrigins = helpers.GetEnv("ALLOW_ORIGINS", "")
-	conf.Cors.AllowMethods = helpers.GetEnv("ALLOW_METHODS", "")
-	conf.Cors.AllowHeaders = helpers.GetEnv("ALLOW_HEADERS", "")
-	conf.Cors.AllowCredentials = helpers.GetEnvAsBool("ALLOW_CREDENTIALS", false)
-	conf.Cors.ExposeHeaders = helpers.GetEnv("EXPOSE_HEADERS", "")
+	conf.Cors.AllowOrigins = utils.GetEnv("ALLOW_ORIGINS", "")
+	conf.Cors.AllowMethods = utils.GetEnv("ALLOW_METHODS", "")
+	conf.Cors.AllowHeaders = utils.GetEnv("ALLOW_HEADERS", "")
+	conf.Cors.AllowCredentials = utils.GetEnvAsBool("ALLOW_CREDENTIALS", false)
+	conf.Cors.ExposeHeaders = utils.GetEnv("EXPOSE_HEADERS", "")
 
-	conf.MQTT.ClientId = helpers.GetEnv("MQTT_CLIENT_ID", "be-ifid")
-	conf.MQTT.Server = helpers.GetEnv("MQTT_SERVER", "")
-	conf.MQTT.Port = helpers.GetEnvAsInt("MQTT_PORT", 1883)
-	conf.MQTT.User = helpers.GetEnv("MQTT_USER", "")
-	conf.MQTT.Password = helpers.GetEnv("MQTT_PASSWORD", "")
-	conf.MQTT.Topic.Watch = helpers.GetEnv("MQTT_TOPIC_WATCH", "")
-	conf.MQTT.Topic.Send = helpers.GetEnv("MQTT_TOPIC_SEND", "")
+	conf.MQTT.ClientId = utils.GetEnv("MQTT_CLIENT_ID", "be-ifid")
+	conf.MQTT.Server = utils.GetEnv("MQTT_SERVER", "")
+	conf.MQTT.Port = utils.GetEnvAsInt("MQTT_PORT", 1883)
+	conf.MQTT.User = utils.GetEnv("MQTT_USER", "")
+	conf.MQTT.Password = utils.GetEnv("MQTT_PASSWORD", "")
+	conf.MQTT.Topic.Watch = utils.GetEnv("MQTT_TOPIC_WATCH", "")
+	conf.MQTT.Topic.Send = utils.GetEnv("MQTT_TOPIC_SEND", "")
 
-	conf.DB.Name = helpers.GetEnv("DB_NAME", "")
-	conf.DB.Host = helpers.GetEnv("DB_HOST", "")
-	conf.DB.Port = helpers.GetEnvAsInt("DB_PORT", 5432)
-	conf.DB.User = helpers.GetEnv("DB_USER", "")
-	conf.DB.Password = helpers.GetEnv("DB_PASSWORD", "")
+	conf.DB.Name = utils.GetEnv("DB_NAME", "")
+	conf.DB.Host = utils.GetEnv("DB_HOST", "")
+	conf.DB.Port = utils.GetEnvAsInt("DB_PORT", 5432)
+	conf.DB.User = utils.GetEnv("DB_USER", "")
+	conf.DB.Password = utils.GetEnv("DB_PASSWORD", "")
+
+	utils.Success("Config is loaded successfully")
 }
 
 func Get() *Config {

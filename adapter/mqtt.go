@@ -2,8 +2,8 @@ package adapter
 
 import (
 	"be-ifid/config"
+	"be-ifid/utils"
 	"fmt"
-	"log"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -11,14 +11,15 @@ import (
 var mqttConn *mqtt.Client
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	log.Println("Connection lost: ", err)
+	utils.SafeError("MQTT connection lost: ", err)
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	log.Println("MQTT connected")
+	utils.Success("MQTT connected")
 }
 
 func MQTTInit() {
+	utils.Info("Connect MQTT server...")
 	conf := config.Get()
 	dsn := fmt.Sprintf("%s:%d", conf.MQTT.Server, conf.MQTT.Port)
 	opts := mqtt.NewClientOptions()
@@ -31,7 +32,7 @@ func MQTTInit() {
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
-		log.Fatalln("MQTT Connect problem: ", token.Error())
+		utils.SafeError("MQTT Connect problem: ", token.Error())
 	}
 
 	mqttConn = new(mqtt.Client)

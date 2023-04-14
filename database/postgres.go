@@ -2,9 +2,9 @@ package database
 
 import (
 	"be-ifid/config"
+	"be-ifid/utils"
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -14,12 +14,13 @@ import (
 var postgresConn *sqlx.DB
 
 func PostgresInit() {
+	utils.Info("Connect postgres server...")
 	conf := config.Get()
 	ctx := context.Background()
 	dsn := fmt.Sprintf("postgresql://%v:%v@%v:%v/%v?sslmode=disable", conf.DB.User, conf.DB.Password, conf.DB.Host, conf.DB.Port, conf.DB.Name)
 	db, err := sqlx.ConnectContext(ctx, "postgres", dsn)
 	if err != nil {
-		log.Fatalln("Postgres connection problem: ", err.Error())
+		utils.Error("Postgres connection problem: ", err)
 	}
 	db.SetMaxIdleConns(10)
 	db.SetConnMaxLifetime(100)
@@ -28,6 +29,8 @@ func PostgresInit() {
 
 	postgresConn = new(sqlx.DB)
 	postgresConn = db
+
+	utils.Success("Postgres connected")
 }
 
 func PostgresGet() *sqlx.DB {

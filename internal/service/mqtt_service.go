@@ -3,9 +3,9 @@ package service
 import (
 	"be-ifid/config"
 	"be-ifid/internal/model"
+	"be-ifid/utils"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -28,7 +28,7 @@ func NewMQTTService(conn mqtt.Client, conf *config.Config) MQTTService {
 
 func (ctx *mqttService) Subscibe() {
 	topic := ctx.conf.MQTT.Topic.Watch
-	log.Println("Set subscribe topic: ", topic)
+	utils.Info("Subscibe to topic", topic+"...")
 
 	token := ctx.conn.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 		data := model.MQTTData{}
@@ -40,5 +40,5 @@ func (ctx *mqttService) Subscibe() {
 	})
 
 	token.Wait()
-	log.Println("Subscribed to topic: ", topic)
+	utils.Success("Subscribed to topic", topic)
 }

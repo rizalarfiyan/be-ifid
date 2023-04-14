@@ -7,8 +7,8 @@ import (
 	"be-ifid/internal"
 	"be-ifid/internal/handler"
 	"be-ifid/internal/service"
+	"be-ifid/utils"
 	"fmt"
-	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,7 +28,7 @@ func main() {
 
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Fatalln("Error closing database: ", err.Error())
+			utils.Error("Error closing database: ", err)
 		}
 	}()
 
@@ -47,6 +47,6 @@ func main() {
 	baseUrl := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	err := app.Listen(baseUrl)
 	if err != nil {
-		log.Fatalf("Error app serve: %v \n", err.Error())
+		utils.Error("Error app serve: ", err)
 	}
 }
