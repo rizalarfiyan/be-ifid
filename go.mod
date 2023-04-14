@@ -5,7 +5,9 @@ go 1.20
 require (
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/gofiber/fiber/v2 v2.43.0
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.2.0
 )
 
 require (

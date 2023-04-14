@@ -12,6 +12,7 @@ type Config struct {
 	Host string
 	Cors CorsConfigs
 	MQTT MQTTConfigs
+	DB   DBConfigs
 }
 
 type CorsConfigs struct {
@@ -32,6 +33,14 @@ type MQTTConfigs struct {
 		Watch string
 		Send  string
 	}
+}
+
+type DBConfigs struct {
+	Name     string
+	Host     string
+	Port     int
+	User     string
+	Password string
 }
 
 var conf *Config
@@ -59,6 +68,12 @@ func Init() {
 	conf.MQTT.Password = helpers.GetEnv("MQTT_PASSWORD", "")
 	conf.MQTT.Topic.Watch = helpers.GetEnv("MQTT_TOPIC_WATCH", "")
 	conf.MQTT.Topic.Send = helpers.GetEnv("MQTT_TOPIC_SEND", "")
+
+	conf.DB.Name = helpers.GetEnv("DB_NAME", "")
+	conf.DB.Host = helpers.GetEnv("DB_HOST", "")
+	conf.DB.Port = helpers.GetEnvAsInt("DB_PORT", 5432)
+	conf.DB.User = helpers.GetEnv("DB_USER", "")
+	conf.DB.Password = helpers.GetEnv("DB_PASSWORD", "")
 }
 
 func Get() *Config {

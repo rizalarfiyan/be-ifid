@@ -3,6 +3,7 @@ package main
 import (
 	"be-ifid/adapter"
 	"be-ifid/config"
+	"be-ifid/database"
 	"be-ifid/internal"
 	"be-ifid/internal/handler"
 	"be-ifid/internal/service"
@@ -17,11 +18,19 @@ import (
 
 func init() {
 	config.Init()
+	database.PostgresInit()
 	adapter.MQTTInit()
 }
 
 func main() {
 	conf := config.Get()
+	db := database.PostgresGet()
+
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Fatalln("Error closing database: ", err.Error())
+		}
+	}()
 
 	app := fiber.New(config.FiberConfig())
 	app.Use(recover.New())
