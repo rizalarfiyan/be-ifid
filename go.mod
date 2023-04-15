@@ -9,6 +9,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.2.0
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/redis/go-redis/v9 v9.0.3
 )
 

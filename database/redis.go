@@ -30,6 +30,7 @@ type RedisInstance interface {
 	HashGet(key string, field string) (string, error)
 	Del(key string) error
 	DelKeysByPatern(patern string) error
+	Keys(patern string) ([]string, error)
 	Close() error
 }
 
@@ -177,16 +178,24 @@ func (r *redisInstance) Del(key string) error {
 }
 
 func (r *redisInstance) DelKeysByPatern(patern string) error {
-	err := r.Ping()
-	if err != nil {
-		return err
-	}
-
-	val, err := r.conn.Keys(r.ctx, patern).Result()
+	val, err := r.Keys(patern)
 	if err != nil {
 		return err
 	}
 	return r.conn.Del(r.ctx, val...).Err()
+}
+
+func (r *redisInstance) Keys(patern string) ([]string, error) {
+	err := r.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	val, err := r.conn.Keys(r.ctx, patern).Result()
+	if err != nil {
+		return nil, err
+	}
+	return val, nil
 }
 
 func (r *redisInstance) Close() error {

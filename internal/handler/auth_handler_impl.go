@@ -23,25 +23,30 @@ func NewAuthHandler(ctx context.Context, conf *config.Config, postgres *sqlx.DB,
 	repo := repository.NewAuthRepository(ctx, conf, postgres, redis)
 	return &authHandler{
 		conf,
-		service.NewAuthService(ctx, conf, repo),
+		service.NewAuthService(ctx, conf, repo, redis),
 	}
 }
 
 func (h *authHandler) Login(ctx *fiber.Ctx) error {
-	var request request.AuthRequest
-	err := ctx.BodyParser(&request)
+	var req request.AuthRequest
+	err := ctx.BodyParser(&req)
 	if err != nil {
 		return response.NewBindingError()
 	}
 
-	err = request.Validate()
+	err = req.Validate()
 	if err != nil {
 		return response.NewValidationError(err)
 	}
 
+	err = h.service.Login(req)
+	if err != nil {
+		return err
+	}
+
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
-		Message: "Login!",
+		Message: "Please check your email to verify your account",
 		Data:    nil,
 	})
 }

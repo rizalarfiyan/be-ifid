@@ -13,6 +13,6 @@ type AuthRequest struct {
 
 func (req AuthRequest) Validate() error {
 	return validation.ValidateStructWithContext(context.Background(), &req,
-		validation.Field(&req.Email, validation.Required, is.Email),
+		validation.Field(&req.Email, validation.Required, is.EmailFormat),
 	)
 }

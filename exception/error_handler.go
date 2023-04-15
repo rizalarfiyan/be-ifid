@@ -15,7 +15,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 
 	var fiberError *fiber.Error
 	var httpError *response.BaseResponse
-	var data interface{} = nil
+	var data interface{} = err.Error()
 	if errors.As(err, &fiberError) {
 		code = fiberError.Code
 		message = http.StatusText(code)
