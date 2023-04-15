@@ -8,6 +8,7 @@ import (
 	"be-ifid/internal/handler"
 	"be-ifid/internal/service"
 	"be-ifid/utils"
+	"context"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
@@ -25,11 +26,18 @@ func init() {
 
 func main() {
 	conf := config.Get()
-	db := database.PostgresGet()
+	ctx := context.Background()
+	db := database.PostgresConnection()
+	redis := database.RedisConnection(ctx)
 
 	defer func() {
-		if err := db.Close(); err != nil {
-			utils.Error("Error closing database: ", err)
+		err := db.Close()
+		if err != nil {
+			utils.Error("Error closing postgres database: ", err)
+		}
+		err = redis.Close()
+		if err != nil {
+			utils.Error("Error closing redis database: ", err)
 		}
 	}()
 
@@ -38,7 +46,7 @@ func main() {
 	app.Use(cors.New(config.CorsConfig()))
 	app.Use(logger.New())
 
-	mqtt := adapter.MQTTGet()
+	mqtt := adapter.MQTTConnection()
 	service.NewMQTTService(*mqtt, conf).Subscibe()
 
 	baseHandler := handler.NewBaseHandler()

@@ -39,7 +39,7 @@ func MQTTInit() {
 	mqttConn = &client
 }
 
-func MQTTGet() *mqtt.Client {
+func MQTTConnection() *mqtt.Client {
 	return mqttConn
 }
 
