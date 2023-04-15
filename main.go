@@ -27,11 +27,11 @@ func init() {
 func main() {
 	conf := config.Get()
 	ctx := context.Background()
-	db := database.PostgresConnection()
+	postgres := database.PostgresConnection()
 	redis := database.RedisConnection(ctx)
 
 	defer func() {
-		err := db.Close()
+		err := postgres.Close()
 		if err != nil {
 			utils.Error("Error closing postgres database: ", err)
 		}
@@ -49,9 +49,13 @@ func main() {
 	mqtt := adapter.MQTTConnection()
 	service.NewMQTTService(*mqtt, conf).Subscibe()
 
-	baseHandler := handler.NewBaseHandler()
 	route := internal.NewRouter(app)
+
+	baseHandler := handler.NewBaseHandler()
+	authHandler := handler.NewAuthHandler(ctx, conf, postgres, redis)
+
 	route.BaseRoute(baseHandler)
+	route.AuthRoute(authHandler)
 
 	baseUrl := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	err := app.Listen(baseUrl)

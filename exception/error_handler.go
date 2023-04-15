@@ -1,7 +1,7 @@
 package exception
 
 import (
-	"be-ifid/internal/model"
+	"be-ifid/internal/response"
 	"errors"
 	"net/http"
 
@@ -16,7 +16,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		code = e.Code
 	}
 
-	return ctx.JSON(model.BaseResponse{
+	return ctx.JSON(response.BaseResponse{
 		Code:    code,
 		Message: http.StatusText(code),
 		Data:    err.Error(),

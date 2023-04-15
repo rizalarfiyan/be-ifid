@@ -3,7 +3,7 @@ package handler
 import (
 	"be-ifid/adapter"
 	"be-ifid/database"
-	"be-ifid/internal/model"
+	"be-ifid/internal/response"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +16,7 @@ func NewBaseHandler() BaseHandler {
 }
 
 func (h *baseHandler) Home(ctx *fiber.Ctx) error {
-	return ctx.JSON(model.BaseResponse{
+	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success!",
 		Data: map[string]interface{}{
