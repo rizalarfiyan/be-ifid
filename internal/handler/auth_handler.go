@@ -3,7 +3,9 @@ package handler
 import (
 	"be-ifid/config"
 	"be-ifid/database"
+	"be-ifid/internal/repository"
 	"be-ifid/internal/response"
+	"be-ifid/internal/service"
 	"context"
 	"net/http"
 
@@ -12,18 +14,15 @@ import (
 )
 
 type authHandler struct {
-	ctx      context.Context
-	conf     *config.Config
-	postgres *sqlx.DB
-	redis    database.RedisInstance
+	conf    *config.Config
+	service service.AuthService
 }
 
 func NewAuthHandler(ctx context.Context, conf *config.Config, postgres *sqlx.DB, redis database.RedisInstance) AuthHandler {
+	repo := repository.NewAuthRepository(ctx, conf, postgres, redis)
 	return &authHandler{
-		ctx,
 		conf,
-		postgres,
-		redis,
+		service.NewAuthService(ctx, conf, repo),
 	}
 }
 
