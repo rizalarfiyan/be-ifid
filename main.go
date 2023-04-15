@@ -20,8 +20,9 @@ import (
 func init() {
 	config.Init()
 	database.PostgresInit()
-	adapter.MQTTInit()
 	database.RedisInit()
+	adapter.MQTTInit()
+	adapter.EmailInit()
 }
 
 func main() {

@@ -7,4 +7,6 @@ const (
 	AuthExpire    = 10 * time.Minute
 
 	RedisKeyAuth = "auth:"
+
+	TemplateSignup = "template/signup.html"
 )

@@ -14,6 +14,8 @@ type Config struct {
 	MQTT  MQTTConfigs
 	DB    DBConfigs
 	Redis RedisConfigs
+	Email EmailConfigs
+	FE    FEConfigs
 }
 
 type CorsConfigs struct {
@@ -55,6 +57,19 @@ type RedisConfigs struct {
 	Password        string
 	ExpiredDuration time.Duration
 	DialTimeout     time.Duration
+}
+
+type EmailConfigs struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	From     string
+}
+
+type FEConfigs struct {
+	BaseUrl         string
+	AuthRedirectUrl string
 }
 
 var conf *Config
@@ -99,6 +114,15 @@ func Init() {
 	conf.Redis.Password = utils.GetEnv("REDIS_PASSWORD", "")
 	conf.Redis.ExpiredDuration = utils.GetEnvAsTimeDuration("REDIS_EXPIRED_DURATION", 15*time.Minute)
 	conf.Redis.DialTimeout = utils.GetEnvAsTimeDuration("REDIS_DIAL_TIMEOUT", 5*time.Minute)
+
+	conf.Email.Host = utils.GetEnv("EMAIL_HOST", "")
+	conf.Email.Port = utils.GetEnvAsInt("EMAIL_PORT", 587)
+	conf.Email.User = utils.GetEnv("EMAIL_USER", "")
+	conf.Email.Password = utils.GetEnv("EMAIL_PASSWORD", "")
+	conf.Email.From = utils.GetEnv("EMAIL_FROM", "")
+
+	conf.FE.BaseUrl = utils.GetEnv("FE_BASE_URL", "")
+	conf.FE.AuthRedirectUrl = utils.GetEnv("FE_AUTH_REDIRECT_URL", "")
 
 	utils.Success("Config is loaded successfully")
 }

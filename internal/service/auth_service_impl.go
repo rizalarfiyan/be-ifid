@@ -1,9 +1,11 @@
 package service
 
 import (
+	"be-ifid/adapter"
 	"be-ifid/config"
 	"be-ifid/constant"
 	"be-ifid/database"
+	"be-ifid/internal/model"
 	"be-ifid/internal/repository"
 	"be-ifid/internal/request"
 	"context"
@@ -33,6 +35,20 @@ func (s *authService) getUniqueKey() string {
 	return id
 }
 
+func (s *authService) sendVerificationEmail(email string, key string) error {
+	emailConnection := adapter.EmailConnection()
+	payload := model.MailPayload{
+		From:    s.conf.Email.From,
+		To:      email,
+		Subject: "Welcome To IFID!",
+	}
+
+	var data = make(map[string]interface{})
+	data["fullName"] = "Rizal Arfiyan"
+	data["verificationCode"] = s.conf.FE.BaseUrl + s.conf.FE.AuthRedirectUrl + "?token=" + key
+	return NewEmailService(s.conf, emailConnection).SendEmail(payload, constant.TemplateSignup, data)
+}
+
 func (s *authService) Login(req request.AuthRequest) error {
 	keyUnique := s.getUniqueKey()
 	keyRedis := fmt.Sprintf("%s%s:%s", constant.RedisKeyAuth, req.Email, keyUnique)
@@ -41,7 +57,10 @@ func (s *authService) Login(req request.AuthRequest) error {
 		return err
 	}
 
-	// DO Send Email
+	err = s.sendVerificationEmail(req.Email, keyUnique)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
