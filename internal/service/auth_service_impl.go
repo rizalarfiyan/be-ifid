@@ -64,3 +64,7 @@ func (s *authService) Login(req request.AuthRequest) error {
 
 	return nil
 }
+
+func (s *authService) Callback(token string) error {
+	return nil
+}

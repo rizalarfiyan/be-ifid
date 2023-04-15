@@ -8,7 +8,7 @@ import (
 )
 
 type AuthRequest struct {
-	Email string `json:"email" validate:"required,email"`
+	Email string `json:"email"`
 }
 
 func (req AuthRequest) Validate() error {

@@ -23,4 +23,5 @@ func (r *router) BaseRoute(handler handler.BaseHandler) {
 func (r *router) AuthRoute(handler handler.AuthHandler) {
 	auth := r.app.Group("/auth")
 	auth.Post("/login", handler.Login)
+	auth.Get("/callback", handler.Callback)
 }

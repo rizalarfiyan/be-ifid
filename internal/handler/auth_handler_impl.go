@@ -2,6 +2,7 @@ package handler
 
 import (
 	"be-ifid/config"
+	"be-ifid/constant"
 	"be-ifid/database"
 	"be-ifid/internal/repository"
 	"be-ifid/internal/request"
@@ -47,6 +48,28 @@ func (h *authHandler) Login(ctx *fiber.Ctx) error {
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Please check your email to verify your account",
+		Data:    nil,
+	})
+}
+
+func (h *authHandler) Callback(ctx *fiber.Ctx) error {
+	token := ctx.Query("token", "")
+	if token == "" {
+		return response.NewErrorMessage(http.StatusBadRequest, "Token is required!", nil)
+	}
+
+	if len(token) != constant.AuthKeyLength {
+		return response.NewErrorMessage(http.StatusUnprocessableEntity, "Token invalid!", nil)
+	}
+
+	err := h.service.Callback(token)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success Login!",
 		Data:    nil,
 	})
 }
