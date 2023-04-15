@@ -8,9 +8,13 @@ import (
 	"be-ifid/internal/model"
 	"be-ifid/internal/repository"
 	"be-ifid/internal/request"
+	"be-ifid/internal/response"
 	"context"
 	"fmt"
+	"net/http"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -65,6 +69,59 @@ func (s *authService) Login(req request.AuthRequest) error {
 	return nil
 }
 
-func (s *authService) Callback(token string) error {
-	return nil
+func (s *authService) createToken(data model.JWTAuthPayload) (string, error) {
+	claims := model.TokenJWT{
+		Data: data,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.conf.JWT.Expired)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(s.conf.JWT.SecretKey))
+}
+
+func (s *authService) Callback(token string) (*response.AuthCallbackResponse, error) {
+	keySearch := fmt.Sprintf("%s*:%s", constant.RedisKeyAuth, token)
+	searchKeys, err := s.redis.Keys(keySearch)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(searchKeys) != 1 {
+		return nil, response.NewErrorMessage(http.StatusUnprocessableEntity, "Token expired!", nil)
+	}
+
+	email, err := s.redis.GetString(searchKeys[0])
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := model.JWTAuthPayload{
+		Email: email,
+		IsNew: true,
+	}
+
+	if user != nil {
+		payload.ID = &user.ID
+		payload.Email = user.Email
+		payload.FirstName = user.FirstName
+		payload.LastName = user.LastName
+		payload.IsNew = false
+	}
+
+	jwtToken, err := s.createToken(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.AuthCallbackResponse{
+		IsNew: payload.IsNew,
+		Token: jwtToken,
+	}, nil
 }

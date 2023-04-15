@@ -16,6 +16,7 @@ type Config struct {
 	Redis RedisConfigs
 	Email EmailConfigs
 	FE    FEConfigs
+	JWT   JWTConfigs
 }
 
 type CorsConfigs struct {
@@ -72,6 +73,11 @@ type FEConfigs struct {
 	AuthRedirectUrl string
 }
 
+type JWTConfigs struct {
+	SecretKey string
+	Expired   time.Duration
+}
+
 var conf *Config
 
 func Init() {
@@ -123,6 +129,9 @@ func Init() {
 
 	conf.FE.BaseUrl = utils.GetEnv("FE_BASE_URL", "")
 	conf.FE.AuthRedirectUrl = utils.GetEnv("FE_AUTH_REDIRECT_URL", "")
+
+	conf.JWT.SecretKey = utils.GetEnv("JWT_SECRET_KEY", "")
+	conf.JWT.Expired = utils.GetEnvAsTimeDuration("JWT_EXPIRED", 5*24*time.Hour)
 
 	utils.Success("Config is loaded successfully")
 }

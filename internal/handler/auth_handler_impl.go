@@ -10,6 +10,7 @@ import (
 	"be-ifid/internal/service"
 	"context"
 	"net/http"
+	"regexp"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
@@ -58,18 +59,23 @@ func (h *authHandler) Callback(ctx *fiber.Ctx) error {
 		return response.NewErrorMessage(http.StatusBadRequest, "Token is required!", nil)
 	}
 
-	if len(token) != constant.AuthKeyLength {
+	match, _ := regexp.MatchString(`^[a-zA-Z0-9-_]+$`, token)
+	if len(token) != constant.AuthKeyLength || !match {
 		return response.NewErrorMessage(http.StatusUnprocessableEntity, "Token invalid!", nil)
 	}
 
-	err := h.service.Callback(token)
+	data, err := h.service.Callback(token)
 	if err != nil {
 		return err
 	}
 
+	message := "Welcome to IFID!"
+	if data.IsNew {
+		message = "Welcome to IFID! Get started by adding your first account."
+	}
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
-		Message: "Success Login!",
-		Data:    nil,
+		Message: message,
+		Data:    data,
 	})
 }
