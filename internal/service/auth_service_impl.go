@@ -69,7 +69,7 @@ func (s *authService) sendVerificationEmail(identity model.AuthIdentity) error {
 	return NewEmailService(s.conf, emailConnection).SendEmail(payload)
 }
 
-func (s *authService) Login(req request.AuthRequest) error {
+func (s *authService) Login(req request.LoginRequest) error {
 	keyUnique := s.getUniqueKey()
 	keyRedis := fmt.Sprintf("%s%s:%s", constant.RedisKeyAuth, req.Email, keyUnique)
 	err := s.redis.Setxc(keyRedis, constant.AuthExpire, req.Email)

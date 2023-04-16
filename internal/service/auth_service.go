@@ -6,6 +6,6 @@ import (
 )
 
 type AuthService interface {
-	Login(req request.AuthRequest) error
+	Login(req request.LoginRequest) error
 	Callback(token string) (*response.AuthCallbackResponse, error)
 }

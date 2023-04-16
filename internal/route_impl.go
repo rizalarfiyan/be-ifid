@@ -2,7 +2,6 @@ package internal
 
 import (
 	"be-ifid/internal/handler"
-	"be-ifid/internal/model"
 	"be-ifid/middleware"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,12 +27,5 @@ func (r *router) AuthRoute(handler handler.AuthHandler) {
 	auth.Get("/callback", handler.Callback)
 
 	protected := auth.Group("/", middleware.NewJWTMiddleware(middleware.JWTConfig{}))
-	protected.Use("/update", func(ctx *fiber.Ctx) error {
-		var user model.JWTAuthPayload
-		err := user.GetFromFiber(ctx)
-		if err != nil {
-			return err
-		}
-		return ctx.JSON(user)
-	})
+	protected.Use("/first-user", handler.FirstUser)
 }

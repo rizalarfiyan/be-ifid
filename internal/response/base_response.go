@@ -2,7 +2,10 @@ package response
 
 import (
 	"be-ifid/utils"
+	"errors"
 	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type BaseResponse struct {
@@ -26,10 +29,19 @@ func NewErrorMessage(code int, message string, data interface{}) *BaseResponse {
 	}
 }
 
-func NewBindingError() *BaseResponse {
+func NewBindingError(err error) *BaseResponse {
+	code := http.StatusBadRequest
+	message := "Binding Validation Error"
+
+	var fiberError *fiber.Error
+	if errors.As(err, &fiberError) {
+		code = fiberError.Code
+		message = fiberError.Message
+	}
+
 	return &BaseResponse{
-		Code:    http.StatusBadRequest,
-		Message: "Binding Validation Error",
+		Code:    code,
+		Message: message,
 		Data:    nil,
 	}
 }

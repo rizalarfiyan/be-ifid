@@ -4,6 +4,7 @@ import (
 	"be-ifid/config"
 	"be-ifid/constant"
 	"be-ifid/database"
+	"be-ifid/internal/model"
 	"be-ifid/internal/repository"
 	"be-ifid/internal/request"
 	"be-ifid/internal/response"
@@ -30,10 +31,10 @@ func NewAuthHandler(ctx context.Context, conf *config.Config, postgres *sqlx.DB,
 }
 
 func (h *authHandler) Login(ctx *fiber.Ctx) error {
-	var req request.AuthRequest
+	var req request.LoginRequest
 	err := ctx.BodyParser(&req)
 	if err != nil {
-		return response.NewBindingError()
+		return response.NewBindingError(err)
 	}
 
 	err = req.Validate()
@@ -78,4 +79,29 @@ func (h *authHandler) Callback(ctx *fiber.Ctx) error {
 		Message: message,
 		Data:    data,
 	})
+}
+
+func (h *authHandler) FirstUser(ctx *fiber.Ctx) error {
+	var user model.JWTAuthPayload
+	err := user.GetFromFiber(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !user.IsNew {
+		return response.NewErrorMessage(http.StatusUnprocessableEntity, "User already registered", nil)
+	}
+
+	var req request.FirstUserRequest
+	err = ctx.BodyParser(&req)
+	if err != nil {
+		return response.NewBindingError(err)
+	}
+
+	err = req.Validate()
+	if err != nil {
+		return response.NewValidationError(err)
+	}
+
+	return nil
 }
