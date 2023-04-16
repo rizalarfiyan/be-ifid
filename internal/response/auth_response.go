@@ -1,6 +1,6 @@
 package response
 
-type AuthCallbackResponse struct {
+type AuthTokenResponse struct {
 	Token string `json:"token"`
 	IsNew bool   `json:"is_new"`
 }

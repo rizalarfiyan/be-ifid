@@ -118,7 +118,7 @@ func (s *authService) createToken(data model.JWTAuthPayload) (string, error) {
 	return token.SignedString([]byte(s.conf.JWT.SecretKey))
 }
 
-func (s *authService) Callback(token string) (*response.AuthCallbackResponse, error) {
+func (s *authService) Callback(token string) (*response.AuthTokenResponse, error) {
 	keySearch := fmt.Sprintf("%s*:%s", constant.RedisKeyAuth, token)
 	searchKeys, err := s.redis.Keys(keySearch)
 	if err != nil {
@@ -162,8 +162,48 @@ func (s *authService) Callback(token string) (*response.AuthCallbackResponse, er
 		return nil, err
 	}
 
-	return &response.AuthCallbackResponse{
+	return &response.AuthTokenResponse{
 		IsNew: payload.IsNew,
+		Token: jwtToken,
+	}, nil
+}
+
+func (s *authService) FirstUser(user model.JWTAuthPayload, req request.FirstUserRequest) (*response.AuthTokenResponse, error) {
+	isExist, err := s.repo.CheckUserByEmail(user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if isExist {
+		return nil, response.NewErrorMessage(http.StatusUnprocessableEntity, "User already registered", nil)
+	}
+
+	payload := model.CreateUserModel{
+		Email:     user.Email,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+	}
+
+	id, err := s.repo.CreateUser(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	jwtPayload := model.JWTAuthPayload{
+		ID:        &id,
+		Email:     payload.Email,
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		IsNew:     false,
+	}
+
+	jwtToken, err := s.createToken(jwtPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.AuthTokenResponse{
+		IsNew: false,
 		Token: jwtToken,
 	}, nil
 }

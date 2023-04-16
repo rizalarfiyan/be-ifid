@@ -103,5 +103,14 @@ func (h *authHandler) FirstUser(ctx *fiber.Ctx) error {
 		return response.NewValidationError(err)
 	}
 
-	return nil
+	data, err := h.service.FirstUser(user, req)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusCreated,
+		Message: "Success save data to database",
+		Data:    data,
+	})
 }
