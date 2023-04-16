@@ -39,18 +39,34 @@ func (s *authService) getUniqueKey() string {
 	return id
 }
 
-func (s *authService) sendVerificationEmail(email string, key string) error {
-	emailConnection := adapter.EmailConnection()
-	payload := model.MailPayload{
-		From:    s.conf.Email.From,
-		To:      email,
-		Subject: "Welcome To IFID!",
+func (s *authService) sendVerificationEmail(identity model.AuthIdentity) error {
+	subject := "Welcome to IFID!"
+	if identity.IsNew {
+		subject = "Welcome to IFID! Get started by adding your first account."
 	}
 
 	var data = make(map[string]interface{})
-	data["fullName"] = "Rizal Arfiyan"
-	data["verificationCode"] = s.conf.FE.BaseUrl + s.conf.FE.AuthRedirectUrl + "?token=" + key
-	return NewEmailService(s.conf, emailConnection).SendEmail(payload, constant.TemplateSignup, data)
+	data["email"] = identity.Email
+	data["title"] = subject
+	data["verificationCode"] = identity.VerificationCode
+
+	payload := model.MailPayload{
+		From:     s.conf.Email.From,
+		To:       identity.Email,
+		Subject:  subject,
+		Template: constant.TemplateSignup,
+		Data:     data,
+	}
+
+	if !identity.IsNew {
+		payload.Template = constant.TemplateLogin
+		payload.Data["firstName"] = identity.FirstName
+		payload.Data["lastName"] = identity.LastName
+		payload.Data["fullName"] = identity.FullName
+	}
+
+	emailConnection := adapter.EmailConnection()
+	return NewEmailService(s.conf, emailConnection).SendEmail(payload)
 }
 
 func (s *authService) Login(req request.AuthRequest) error {
@@ -61,7 +77,28 @@ func (s *authService) Login(req request.AuthRequest) error {
 		return err
 	}
 
-	err = s.sendVerificationEmail(req.Email, keyUnique)
+	user, err := s.repo.GetUserByEmail(req.Email)
+	if err != nil {
+		return err
+	}
+
+	payload := model.AuthIdentity{
+		Email: req.Email,
+		IsNew: true,
+	}
+
+	payload.SetVerificationCode(keyUnique, *s.conf)
+
+	if user != nil {
+		payload.ID = &user.ID
+		payload.Email = user.Email
+		payload.FirstName = user.FirstName
+		payload.LastName = user.LastName
+		payload.IsNew = false
+		payload.GetFullName()
+	}
+
+	err = s.sendVerificationEmail(payload)
 	if err != nil {
 		return err
 	}
@@ -93,6 +130,11 @@ func (s *authService) Callback(token string) (*response.AuthCallbackResponse, er
 	}
 
 	email, err := s.redis.GetString(searchKeys[0])
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.redis.Del(searchKeys[0])
 	if err != nil {
 		return nil, err
 	}

@@ -9,4 +9,5 @@ const (
 	RedisKeyAuth = "auth:"
 
 	TemplateSignup = "template/signup.html"
+	TemplateLogin  = "template/login.html"
 )

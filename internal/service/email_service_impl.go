@@ -35,8 +35,8 @@ func (s *emailService) generateTemplate(templatePath string, data interface{}) (
 	return tpl.String(), nil
 }
 
-func (s *emailService) SendEmail(payload model.MailPayload, template string, data interface{}) error {
-	template, err := s.generateTemplate(template, data)
+func (s *emailService) SendEmail(payload model.MailPayload) error {
+	template, err := s.generateTemplate(payload.Template, payload.Data)
 	if err != nil {
 		return err
 	}
