@@ -2,8 +2,10 @@ package model
 
 import (
 	"be-ifid/config"
+	"encoding/json"
 	"fmt"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
@@ -22,7 +24,6 @@ type JWTAuthPayload struct {
 	Email     string     `json:"email"`
 	FirstName string     `json:"first_name"`
 	LastName  string     `json:"last_name"`
-	FullName  string     `json:"-"`
 	IsNew     bool       `json:"is_new"`
 }
 
@@ -32,4 +33,16 @@ func (auth *AuthIdentity) GetFullName() {
 
 func (auth *AuthIdentity) SetVerificationCode(keyUnique string, conf config.Config) {
 	auth.VerificationCode = conf.FE.BaseUrl + conf.FE.AuthRedirectUrl + "?token=" + keyUnique
+}
+
+func (jwt *JWTAuthPayload) GetFromFiber(ctx *fiber.Ctx) error {
+	userStr, err := json.Marshal(ctx.Locals("user"))
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(userStr, &jwt)
+	if err != nil {
+		return err
+	}
+	return nil
 }
