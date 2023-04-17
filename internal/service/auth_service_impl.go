@@ -134,7 +134,8 @@ func (s *authService) Callback(token string) (*response.AuthTokenResponse, error
 		return nil, err
 	}
 
-	err = s.redis.Del(searchKeys[0])
+	keySearchEmail := fmt.Sprintf("%s%s:*", constant.RedisKeyAuth, email)
+	err = s.redis.DelKeysByPatern(keySearchEmail)
 	if err != nil {
 		return nil, err
 	}
