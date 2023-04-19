@@ -114,3 +114,17 @@ func (h *authHandler) FirstUser(ctx *fiber.Ctx) error {
 		Data:    data,
 	})
 }
+
+func (h *authHandler) Me(ctx *fiber.Ctx) error {
+	var user model.JWTAuthPayload
+	err := user.GetFromFiber(ctx)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(response.BaseResponse{
+		Code:    http.StatusOK,
+		Message: "Success get user data",
+		Data:    nil,
+	})
+}

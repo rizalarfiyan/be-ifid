@@ -27,5 +27,6 @@ func (r *router) AuthRoute(handler handler.AuthHandler) {
 	auth.Get("/callback", handler.Callback)
 
 	protected := auth.Group("/", middleware.NewJWTMiddleware(middleware.JWTConfig{}))
-	protected.Use("/first-user", handler.FirstUser)
+	protected.Get("/me", handler.Me)
+	protected.Post("/first-user", handler.FirstUser)
 }
