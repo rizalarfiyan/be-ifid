@@ -12,6 +12,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -207,4 +208,25 @@ func (s *authService) FirstUser(user model.JWTAuthPayload, req request.FirstUser
 		IsNew: false,
 		Token: jwtToken,
 	}, nil
+}
+
+func (s *authService) Me(user model.JWTAuthPayload) (*response.AuthMeResponse, error) {
+	var resp response.AuthMeResponse
+	if strings.TrimSpace(user.Email) == "" {
+		return &resp, nil
+	}
+
+	data, err := s.repo.GetUserByEmail(user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	resp.ID = &data.ID
+	resp.Email = data.Email
+	resp.FirstName = data.FirstName
+	resp.LastName = data.LastName
+	resp.GetFullName()
+	resp.IsValid = true
+
+	return &resp, nil
 }

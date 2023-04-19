@@ -122,9 +122,14 @@ func (h *authHandler) Me(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	data, err := h.service.Me(user)
+	if err != nil {
+		return err
+	}
+
 	return ctx.JSON(response.BaseResponse{
 		Code:    http.StatusOK,
 		Message: "Success get user data",
-		Data:    nil,
+		Data:    data,
 	})
 }

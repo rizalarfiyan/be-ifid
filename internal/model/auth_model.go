@@ -3,7 +3,7 @@ package model
 import (
 	"be-ifid/config"
 	"encoding/json"
-	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -28,7 +28,10 @@ type JWTAuthPayload struct {
 }
 
 func (auth *AuthIdentity) GetFullName() {
-	auth.FullName = fmt.Sprintf("%s %s", auth.FirstName, auth.LastName)
+	auth.FullName = auth.FirstName
+	if strings.TrimSpace(auth.LastName) != "" {
+		auth.FullName += " " + auth.LastName
+	}
 }
 
 func (auth *AuthIdentity) SetVerificationCode(keyUnique string, conf config.Config) {
