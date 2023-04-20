@@ -221,12 +221,14 @@ func (s *authService) Me(user model.JWTAuthPayload) (*response.AuthMeResponse, e
 		return nil, err
 	}
 
-	resp.ID = &data.ID
-	resp.Email = data.Email
-	resp.FirstName = data.FirstName
-	resp.LastName = data.LastName
-	resp.GetFullName()
-	resp.IsValid = true
+	if data != nil {
+		resp.ID = &data.ID
+		resp.Email = data.Email
+		resp.FirstName = data.FirstName
+		resp.LastName = data.LastName
+		resp.GetFullName()
+		resp.IsValid = true
+	}
 
 	return &resp, nil
 }
